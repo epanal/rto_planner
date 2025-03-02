@@ -1,4 +1,4 @@
 streamlit
 requests
 protobuf
-google-gtfs-realtime-bindings
+gtfs-realtime-bindings
