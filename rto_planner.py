@@ -2,13 +2,8 @@ import streamlit as st
 import requests
 from google.transit import gtfs_realtime_pb2
 from datetime import datetime, timedelta
-from dotenv import load_dotenv
-import os
 
-# Load .env file
-load_dotenv()
-
-API_KEY = os.getenv("api")
+API_KEY = st.secrets["API_KEY"]
 
 if not API_KEY:
     raise ValueError("weather api is missing! Check .env file.")
