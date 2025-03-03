@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from google.transit import gtfs_realtime_pb2
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta,timezone
 import pytz
 
 API_KEY = st.secrets["API_KEY"]
@@ -87,9 +87,7 @@ def get_packing_recommendations(weather):
 
 # Function to convert Unix timestamp to readable time
 def format_time(timestamp):
-    pacific = pytz.timezone("America/Los_Angeles")
-    departure_time_pacific = datetime.fromtimestamp(timestamp, tz=pytz.utc).astimezone(pacific)
-    return departure_time_pacific.strftime("%I:%M %p")
+    return datetime.fromtimestamp(timestamp).strftime('%I:%M %p')
 
 def get_motivational_quote():
     response = requests.get("https://zenquotes.io/api/random")
@@ -138,8 +136,87 @@ def find_upcoming_bart_trips(feed):
                         if any(s.stop_id == destination_station for s in stops):
                             bart_trips.append({
                                 "route": entity.trip_update.trip.route_id,
-                                "departure_time": format_time(departure_time),
+                                "departure_time": datetime.fromtimestamp(departure_time).strftime("%H:%M:%S"),
                                 "destination": destination_station
                             })
 
     return bart_trips
+
+# Streamlit UI
+st.title("🏢 Ethan's Commute App")
+
+st.subheader("🌟 Daily Motivation")
+st.write(get_motivational_quote())
+
+# Get the next workday
+next_workday = get_next_workday().strftime("%A, %B %d")
+st.subheader(f"🌤 Weather for {next_workday}")
+
+# Get weather for both locations
+home_current, home_forecast = get_weather("94040")  # Mountain View, CA
+office_current, office_forecast = get_weather("94612")  # Oakland, CA
+
+col1, col2 = st.columns(2)
+
+# Display Home Weather (Current & Forecasted)
+with col1:
+    st.write("🏠 **Home (Mountain View, 94040)**")
+    if home_current:
+        st.write(f"**Current:** {home_current['temp']}°F, {home_current['condition']}")
+    else:
+        st.write("⚠️ Error fetching current weather")
+
+    if home_forecast:
+        st.write(f"**Forecast for {next_workday}:** {home_forecast['temp']}°F, {home_forecast['condition']}")
+    else:
+        st.write("⚠️ Error fetching forecast")
+
+# Display Office Weather (Current & Forecasted)
+with col2:
+    st.write("🏢 **Office (Oakland, 94612)**")
+    if office_current:
+        st.write(f"**Current:** {office_current['temp']}°F, {office_current['condition']}")
+    else:
+        st.write("⚠️ Error fetching current weather")
+
+    if office_forecast:
+        st.write(f"**Forecast for {next_workday}:** {office_forecast['temp']}°F, {office_forecast['condition']}")
+    else:
+        st.write("⚠️ Error fetching forecast")
+
+# Get packing recommendations based on next workday's forecast
+packing_list = get_packing_recommendations(office_forecast)
+
+st.subheader("🎒 Packing Checklist")
+for item in packing_list:
+    st.checkbox(item, key=item)
+
+# Podcast 
+st.subheader("🎙 Podcasts")
+st.markdown("[🎧 The Best One Yet (TBOY)](https://open.spotify.com/show/5RllMBgvDnTau8nnsCUdse)")
+st.markdown("[🎧 Morning Brew Daily](https://open.spotify.com/show/7nc7OQdPTekErtFSRxOBKh)")
+st.markdown("[🎧 NPR Life Kit](https://open.spotify.com/show/5J0xAfsLX7bEYzGxOin4Sd)")
+
+
+# Fetch BART real-time data
+bart_feed = get_bart_real_time()
+# Fetch BART alerts
+st.subheader("🚨 BART Service Alerts")
+
+bart_alerts = get_all_bart_alerts()
+
+for alert in bart_alerts:
+    st.write(f"⚠️ {alert}")
+
+# Get upcoming BART trips in the next hour
+filtered_trips = find_upcoming_bart_trips(bart_feed)  # Use the updated function
+
+# Display results dynamically based on the current time
+st.subheader("🚆 BART Real-Time Departures from Daly City (Next Hour)")
+
+if filtered_trips:
+    for trip in filtered_trips:
+        st.write(f"Train on route {trip['route']} departing at {trip['departure_time']}")
+else:
+    st.write("No upcoming trains available in the next hour.")
+
