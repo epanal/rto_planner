@@ -104,23 +104,37 @@ def get_bart_real_time():
 
 def filter_bart_trips(feed):
     filtered_trips = []
-    oakland_stations = ["12TH"] #, "19TH", "LAKE", "FTVL", "COLM"] #Example Oakland stops. add more as needed.
+    oakland_stations = ["12TH", "19TH", "LAKE", "FTVL", "COLM"]  # Expanded Oakland stops
+    min_time = 6 * 60 + 30  # 6:30 AM
+    max_time = 7 * 60 + 30  # 7:30 AM
+
     for entity in feed.entity:
         if entity.trip_update:
             for stop in entity.trip_update.stop_time_update:
-                if stop.stop_id == "DALY" and stop.arrival.time:
-                    departure_time = datetime.fromtimestamp(stop.arrival.time)
-                    if departure_time.weekday() < 5 and 6*60 + 40 <= departure_time.hour*60 + departure_time.minute <= 7*60 + 20:
-                        is_oakland_trip = False
-                        for later_stop in entity.trip_update.stop_time_update:
-                            if later_stop.stop_id in oakland_stations and later_stop.arrival.time > stop.arrival.time:
-                                is_oakland_trip = True
-                                break
+                stop_id = stop.stop_id  # Debugging
+                arrival_time = stop.arrival.time if stop.HasField("arrival") else None
+                
+                if stop_id == "DALY" and arrival_time:
+                    departure_time = datetime.fromtimestamp(arrival_time)
+                    departure_minutes = departure_time.hour * 60 + departure_time.minute
+
+                    if departure_time.weekday() < 5 and min_time <= departure_minutes <= max_time:
+                        # Check for a later Oakland-bound stop
+                        is_oakland_trip = any(
+                            s.stop_id in oakland_stations and s.arrival.time > arrival_time
+                            for s in entity.trip_update.stop_time_update
+                        )
+
                         if is_oakland_trip:
                             filtered_trips.append({
                                 "route": entity.trip_update.trip.route_id,
-                                "time": format_time(stop.arrival.time)
+                                "time": format_time(arrival_time)
                             })
+
+    # Debugging: Print if no trains found
+    if not filtered_trips:
+        print("⚠️ No BART trains found in time window! Check stop IDs and time filtering.")
+
     return filtered_trips
 
 # Streamlit UI
