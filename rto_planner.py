@@ -90,26 +90,31 @@ def get_motivational_quote():
         return f"💡 *{quote_data[0]['q']}* - {quote_data[0]['a']}"
     return "💡 Stay positive, work hard, and make it happen!"
 
-# Function to fetch and parse BART GTFS-Realtime data
 def get_bart_real_time():
     feed = gtfs_realtime_pb2.FeedMessage()
     response = requests.get('https://api.bart.gov/gtfsrt/tripupdate.aspx')
     feed.ParseFromString(response.content)
     return feed
 
-# Function to filter trips from Daly City within the desired time range
 def filter_bart_trips(feed):
     filtered_trips = []
+    oakland_stations = ["12TH"] #, "19TH", "LAKE", "FTVL", "COLM"] #Example Oakland stops. add more as needed.
     for entity in feed.entity:
         if entity.trip_update:
             for stop in entity.trip_update.stop_time_update:
                 if stop.stop_id == "DALY" and stop.arrival.time:
                     departure_time = datetime.fromtimestamp(stop.arrival.time)
                     if departure_time.weekday() < 5 and 6*60 + 40 <= departure_time.hour*60 + departure_time.minute <= 7*60 + 20:
-                        filtered_trips.append({
-                            "route": entity.trip_update.trip.route_id,
-                            "time": format_time(stop.arrival.time)
-                        })
+                        is_oakland_trip = False
+                        for later_stop in entity.trip_update.stop_time_update:
+                            if later_stop.stop_id in oakland_stations and later_stop.arrival.time > stop.arrival.time:
+                                is_oakland_trip = True
+                                break
+                        if is_oakland_trip:
+                            filtered_trips.append({
+                                "route": entity.trip_update.trip.route_id,
+                                "time": format_time(stop.arrival.time)
+                            })
     return filtered_trips
 
 # Streamlit UI
