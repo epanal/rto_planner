@@ -119,7 +119,8 @@ def get_bart_real_time():
     return feed
 
 def find_upcoming_bart_trips(feed):
-    current_time = datetime.now(timezone.utc).timestamp()  # Current time in UTC
+    pacific = pytz.timezone("America/Los_Angeles")
+    current_time = datetime.now(pacific).timestamp()  # Current time in local timezone
     next_hour = current_time + 3600  # One hour from now
     destination_station = "12TH"
     
@@ -136,7 +137,7 @@ def find_upcoming_bart_trips(feed):
                         if any(s.stop_id == destination_station for s in stops):
                             bart_trips.append({
                                 "route": entity.trip_update.trip.route_id,
-                                "departure_time": datetime.fromtimestamp(departure_time).strftime("%H:%M:%S"),
+                                "departure_time": format_time(departure_time),
                                 "destination": destination_station
                             })
 
