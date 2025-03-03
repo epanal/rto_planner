@@ -139,8 +139,7 @@ def find_upcoming_bart_trips(feed):
                         if any(s.stop_id == destination_station for s in stops):
                             bart_trips.append({
                                 "route": entity.trip_update.trip.route_id,
-                                "departure_time": departure_time,
-                                "formatted_departure": format_local_time(departure_time),
+                                "departure_time": format_local_time(departure_time),
                                 "destination": destination_station
                             })
 
@@ -148,7 +147,6 @@ def find_upcoming_bart_trips(feed):
     bart_trips.sort(key=lambda x: x["departure_time"])
 
     return bart_trips
-
 
 # Streamlit UI
 st.title("🏢 Ethan's Commute App")
