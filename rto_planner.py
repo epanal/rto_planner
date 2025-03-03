@@ -86,8 +86,10 @@ def get_packing_recommendations(weather):
     return items
 
 # Function to convert Unix timestamp to readable time
-def format_time(timestamp):
-    return datetime.fromtimestamp(timestamp).strftime('%I:%M %p')
+def format_local_time(timestamp):
+    pacific = pytz.timezone("America/Los_Angeles")
+    local_time = datetime.fromtimestamp(timestamp, pacific)
+    return local_time.strftime('%A, %B %d at %I:%M %p')
 
 def get_motivational_quote():
     response = requests.get("https://zenquotes.io/api/random")
