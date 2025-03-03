@@ -8,14 +8,11 @@ API_KEY = st.secrets["API_KEY"]
 if not API_KEY:
     raise ValueError("weather api is missing! Check .env file.")
 
-# Function to determine the next working weekday (Monday - Friday)
 def get_next_workday():
-    today = datetime.today().weekday()  # 0 = Monday, 6 = Sunday
-    if today >= 5:  # Saturday (5) or Sunday (6)
-        days_ahead = 7 - today  # Days until next Monday
-    else:
-        days_ahead = 1  # Otherwise, just get tomorrow
-    return datetime.today() + timedelta(days=days_ahead)
+    next_day = datetime.today() + timedelta(days=1)
+    while next_day.weekday() >= 5:  # If it's Saturday (5) or Sunday (6), keep adding a day
+        next_day += timedelta(days=1)
+    return next_day
 
 def get_weather(zip_code):
     # Get current weather
