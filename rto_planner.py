@@ -1,7 +1,7 @@
 import streamlit as st
 import requests
 from google.transit import gtfs_realtime_pb2
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta,timezone
 import pytz
 
 API_KEY = st.secrets["API_KEY"]
@@ -118,34 +118,29 @@ def get_bart_real_time():
     feed.ParseFromString(response.content)
     return feed
 
-def filter_bart_trips(feed):
-    filtered_trips = []
-    oakland_stations = ["12TH", "19TH", "LAKE", "FTVL", "COLM"]  # Expanded Oakland stops
-    min_time = 6 * 60 + 30  # 6:30 AM
-    max_time = 7 * 60 + 30  # 7:30 AM
+def find_upcoming_bart_trips(feed):
+    current_time = datetime.now(timezone.utc).timestamp()  # Current time in UTC
+    next_hour = current_time + 3600  # One hour from now
+    destination_station = "12TH"
+    
+    bart_trips = []
 
     for entity in feed.entity:
         if entity.trip_update:
-            for stop in entity.trip_update.stop_time_update:
-                stop_id = stop.stop_id  # Debugging
-                arrival_time = stop.arrival.time if stop.HasField("arrival") else None
-                
-                if stop_id == "DALY" and arrival_time:
-                    departure_time = datetime.fromtimestamp(arrival_time)
-                    departure_minutes = departure_time.hour * 60 + departure_time.minute
-
-                    if departure_time.weekday() < 5 and min_time <= departure_minutes <= max_time:
-                        # Check for a later Oakland-bound stop
-                        is_oakland_trip = any(
-                            s.stop_id in oakland_stations and s.arrival.time > arrival_time
-                            for s in entity.trip_update.stop_time_update
-                        )
-
-                        if is_oakland_trip:
-                            filtered_trips.append({
+            stops = entity.trip_update.stop_time_update
+            for stop in stops:
+                if stop.stop_id == "DALY" and stop.HasField("departure"):
+                    departure_time = stop.departure.time
+                    if current_time <= departure_time <= next_hour:
+                        # Ensure the train goes to 12th Street Oakland
+                        if any(s.stop_id == destination_station for s in stops):
+                            bart_trips.append({
                                 "route": entity.trip_update.trip.route_id,
-                                "time": format_time(arrival_time)
+                                "departure_time": datetime.fromtimestamp(departure_time).strftime("%H:%M:%S"),
+                                "destination": destination_station
                             })
+
+    return bart_trips
 
     # Debugging: Print if no trains found
     if not filtered_trips:
@@ -211,7 +206,7 @@ st.markdown("[🎧 NPR Life Kit](https://open.spotify.com/show/5J0xAfsLX7bEYzGxO
 
 # Fetch BART real-time data
 bart_feed = get_bart_real_time()
-filtered_trips = filter_bart_trips(bart_feed)
+filtered_trips = find_upcoming_bart_trips(bart_feed)
 
 # Fetch BART alerts
 st.subheader("🚨 BART Service Alerts")
