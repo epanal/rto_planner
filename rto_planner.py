@@ -101,17 +101,16 @@ def get_daly_city_alerts():
     data = response.json()
     
     alerts = data.get('root', {}).get('bsa', [])
-    daly_city_alerts = []
+    all_alerts = []
     
     if alerts and isinstance(alerts, list):
         for alert in alerts:
             description = alert.get('description', {}).get('#cdata-section', '')
-            if "Daly City" in description:
-                daly_city_alerts.append(description)
+            all_alerts.append(description)
     
-    if daly_city_alerts:
-        print("🚨 Daly City Alerts 🚨")
-        for alert in daly_city_alerts:
+    if all_alerts:
+        print("🚨 BART Alerts 🚨")
+        for alert in all_alerts:
             print(f"⚠️ {alert}")
     else:
         print("✅ No service alerts for Daly City!")
