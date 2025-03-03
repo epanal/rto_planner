@@ -96,6 +96,26 @@ def get_motivational_quote():
         return f"💡 *{quote_data[0]['q']}* - {quote_data[0]['a']}"
     return "💡 Stay positive, work hard, and make it happen!"
 
+def get_daly_city_alerts():
+    response = requests.get("https://api.bart.gov/api/bsa.aspx?cmd=bsa&json=y")
+    data = response.json()
+    
+    alerts = data.get('root', {}).get('bsa', [])
+    daly_city_alerts = []
+    
+    if alerts and isinstance(alerts, list):
+        for alert in alerts:
+            description = alert.get('description', {}).get('#cdata-section', '')
+            if "Daly City" in description:
+                daly_city_alerts.append(description)
+    
+    if daly_city_alerts:
+        print("🚨 Daly City Alerts 🚨")
+        for alert in daly_city_alerts:
+            print(f"⚠️ {alert}")
+    else:
+        print("✅ No service alerts for Daly City!")
+
 def get_bart_real_time():
     feed = gtfs_realtime_pb2.FeedMessage()
     response = requests.get('https://api.bart.gov/gtfsrt/tripupdate.aspx')
@@ -196,6 +216,13 @@ st.markdown("[🎧 NPR Life Kit](https://open.spotify.com/show/5J0xAfsLX7bEYzGxO
 # Fetch BART real-time data
 bart_feed = get_bart_real_time()
 filtered_trips = filter_bart_trips(bart_feed)
+
+# Fetch BART alerts
+bart_alerts = get_daly_city_alerts()
+
+# Display BART alerts
+st.subheader("🚆 Current Daly City BART alerts")
+st.write(bart_alerts)
 
 # Display BART real-time departures
 st.subheader("🚆 BART Real-Time Departures from Daly City (Weekdays 6:40 AM - 7:20 AM)")
