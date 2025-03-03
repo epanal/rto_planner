@@ -96,24 +96,21 @@ def get_motivational_quote():
         return f"💡 *{quote_data[0]['q']}* - {quote_data[0]['a']}"
     return "💡 Stay positive, work hard, and make it happen!"
 
-def get_daly_city_alerts():
-    response = requests.get("https://api.bart.gov/api/bsa.aspx?cmd=bsa&json=y")
-    data = response.json()
-    
-    alerts = data.get('root', {}).get('bsa', [])
-    all_alerts = []
-    
-    if alerts and isinstance(alerts, list):
-        for alert in alerts:
-            description = alert.get('description', {}).get('#cdata-section', '')
-            all_alerts.append(description)
-    
-    if all_alerts:
-        print("🚨 BART Alerts 🚨")
-        for alert in all_alerts:
-            print(f"⚠️ {alert}")
-    else:
-        print("✅ No service alerts for Daly City!")
+def get_all_bart_alerts():
+    feed = gtfs_realtime_pb2.FeedMessage()
+    response = requests.get("https://api.bart.gov/gtfsrt/alerts.aspx")
+
+    if response.status_code != 200:
+        return ["⚠️ Unable to fetch BART alerts."]
+
+    feed.ParseFromString(response.content)
+
+    all_alerts = [
+        entity.alert.description_text.translation[0].text
+        for entity in feed.entity if entity.HasField("alert")
+    ]
+
+    return all_alerts if all_alerts else ["✅ No active BART service alerts."]
 
 def get_bart_real_time():
     feed = gtfs_realtime_pb2.FeedMessage()
@@ -217,11 +214,12 @@ bart_feed = get_bart_real_time()
 filtered_trips = filter_bart_trips(bart_feed)
 
 # Fetch BART alerts
-bart_alerts = get_daly_city_alerts()
+st.subheader("🚨 BART Service Alerts for Daly City")
 
-# Display BART alerts
-st.subheader("🚆 Current Daly City BART alerts")
-st.write(bart_alerts)
+bart_alerts = get_all_bart_alerts()
+
+for alert in bart_alerts:
+    st.write(f"⚠️ {alert}")
 
 # Display BART real-time departures
 st.subheader("🚆 BART Real-Time Departures from Daly City (Weekdays 6:40 AM - 7:20 AM)")
