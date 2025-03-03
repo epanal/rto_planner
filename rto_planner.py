@@ -206,8 +206,6 @@ st.markdown("[🎧 NPR Life Kit](https://open.spotify.com/show/5J0xAfsLX7bEYzGxO
 
 # Fetch BART real-time data
 bart_feed = get_bart_real_time()
-filtered_trips = find_upcoming_bart_trips(bart_feed)
-
 # Fetch BART alerts
 st.subheader("🚨 BART Service Alerts")
 
@@ -216,13 +214,15 @@ bart_alerts = get_all_bart_alerts()
 for alert in bart_alerts:
     st.write(f"⚠️ {alert}")
 
-# Display BART real-time departures
-st.subheader("🚆 BART Real-Time Departures from Daly City (Weekdays 6:40 AM - 7:20 AM)")
+# Get upcoming BART trips in the next hour
+filtered_trips = find_upcoming_bart_trips(bart_feed)  # Use the updated function
+
+# Display results dynamically based on the current time
+st.subheader("🚆 BART Real-Time Departures from Daly City (Next Hour)")
 
 if filtered_trips:
     for trip in filtered_trips:
-        st.write(f"Train to {trip['route']} departing at {trip['time']}")
+        st.write(f"Train on route {trip['route']} departing at {trip['departure_time']}")
 else:
-    st.write("No trains available in this time window.")
-
+    st.write("No upcoming trains available in the next hour.")
 
