@@ -214,7 +214,7 @@ bart_feed = get_bart_real_time()
 filtered_trips = filter_bart_trips(bart_feed)
 
 # Fetch BART alerts
-st.subheader("🚨 BART Service Alerts for Daly City")
+st.subheader("🚨 BART Service Alerts")
 
 bart_alerts = get_all_bart_alerts()
 
