@@ -79,13 +79,6 @@ def get_packing_recommendations(weather):
 
     return items
 
-# Function to fetch and parse BART GTFS-Realtime data
-def get_bart_real_time():
-    feed = gtfs_realtime_pb2.FeedMessage()
-    response = requests.get('https://api.bart.gov/gtfsrt/tripupdate.aspx')
-    feed.ParseFromString(response.content)
-    return feed
-
 # Function to convert Unix timestamp to readable time
 def format_time(timestamp):
     return datetime.fromtimestamp(timestamp).strftime('%I:%M %p')
@@ -96,6 +89,13 @@ def get_motivational_quote():
         quote_data = response.json()
         return f"💡 *{quote_data[0]['q']}* - {quote_data[0]['a']}"
     return "💡 Stay positive, work hard, and make it happen!"
+
+# Function to fetch and parse BART GTFS-Realtime data
+def get_bart_real_time():
+    feed = gtfs_realtime_pb2.FeedMessage()
+    response = requests.get('https://api.bart.gov/gtfsrt/tripupdate.aspx')
+    feed.ParseFromString(response.content)
+    return feed
 
 # Function to filter trips from Daly City within the desired time range
 def filter_bart_trips(feed):
