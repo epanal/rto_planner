@@ -167,8 +167,11 @@ for item in packing_list:
     st.checkbox(item, key=item)
 
 # Podcast 
-st.subheader("🎙 The Best One Yet (TBOY) Podcast")
-st.markdown("[🎧 Listen on Spotify](https://open.spotify.com/show/5RllMBgvDnTau8nnsCUdse)")
+st.subheader("🎙 Podcasts")
+st.markdown("[🎧 The Best One Yet (TBOY)](https://open.spotify.com/show/5RllMBgvDnTau8nnsCUdse)")
+st.markdown("[🎧 Morning Brew Daily](https://open.spotify.com/show/7nc7OQdPTekErtFSRxOBKh)")
+st.markdown("[🎧 NPR Life Kit](https://open.spotify.com/show/5J0xAfsLX7bEYzGxOin4Sd)")
+
 
 # Fetch BART real-time data
 bart_feed = get_bart_real_time()
