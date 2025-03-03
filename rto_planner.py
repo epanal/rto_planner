@@ -67,7 +67,7 @@ def get_weather(zip_code):
 
 # Packing suggestions based on forecasted weather
 def get_packing_recommendations(weather):
-    items = ["Laptop", "Work Badge", "AirPods", "Podcast Playlist", "Webcam", "BART Parking or Amtrak Ticket Paid"]  # Default essentials
+    items = ["Laptop", "Work Badge", "AirPods", "Webcam", "BART Parking or Amtrak Ticket Paid"]  # Default essentials
 
     if weather:
         if weather["temp"] < 55:
@@ -166,6 +166,10 @@ st.subheader("🎒 Packing Checklist")
 for item in packing_list:
     st.checkbox(item, key=item)
 
+# Podcast 
+st.subheader("🎙 The Best One Yet (TBOY) Podcast")
+st.markdown("[🎧 Listen on Spotify](https://open.spotify.com/show/5RllMBgvDnTau8nnsCUdse)")
+
 # Fetch BART real-time data
 bart_feed = get_bart_real_time()
 filtered_trips = filter_bart_trips(bart_feed)
@@ -178,3 +182,5 @@ if filtered_trips:
         st.write(f"Train to {trip['route']} departing at {trip['time']}")
 else:
     st.write("No trains available in this time window.")
+
+
