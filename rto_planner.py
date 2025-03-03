@@ -11,10 +11,16 @@ if not API_KEY:
 
 def get_next_workday():
     pacific = pytz.timezone("America/Los_Angeles")
-    today_local = datetime.now(pacific)  # Get current time in California
-    next_day = today_local + timedelta(days=1)
+    now_local = datetime.now(pacific)
 
-    while next_day.weekday() >= 5:  # Skip Saturday (5) and Sunday (6)
+    # If it's after noon (12 PM), get the next workday
+    if now_local.hour >= 12:
+        next_day = now_local + timedelta(days=1)
+    else:
+        next_day = now_local  # Keep today if it's before noon
+
+    # Skip weekends
+    while next_day.weekday() >= 5:  # 5 = Saturday, 6 = Sunday
         next_day += timedelta(days=1)
 
     return next_day
