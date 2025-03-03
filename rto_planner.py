@@ -139,7 +139,7 @@ def find_upcoming_bart_trips(feed):
                         if any(s.stop_id == destination_station for s in stops):
                             bart_trips.append({
                                 "route": entity.trip_update.trip.route_id,
-                                "departure_time": format_time(departure_time),
+                                "departure_time": format_local_time(departure_time),
                                 "destination": destination_station
                             })
 
