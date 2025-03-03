@@ -118,7 +118,7 @@ def filter_bart_trips(feed):
     return filtered_trips
 
 # Streamlit UI
-st.title("🏢 Ethan's RTO Planner")
+st.title("🏢 Ethan's Commute App")
 
 st.subheader("🌟 Daily Motivation")
 st.write(get_motivational_quote())
