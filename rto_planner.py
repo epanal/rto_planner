@@ -222,7 +222,7 @@ st.subheader("🚆 BART Real-Time Departures from Daly City (Next Hour)")
 
 if filtered_trips:
     for trip in filtered_trips:
-        st.write(f"Train on route {trip['route']} departing at {trip['departure_time']}")
+        st.write(f"Train departing at {trip['departure_time']} for {trip['destination']}")
 else:
     st.write("No upcoming trains available in the next hour.")
 
