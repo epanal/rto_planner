@@ -2,6 +2,7 @@ import streamlit as st
 import requests
 from google.transit import gtfs_realtime_pb2
 from datetime import datetime, timedelta
+import pytz
 
 API_KEY = st.secrets["API_KEY"]
 
@@ -9,9 +10,13 @@ if not API_KEY:
     raise ValueError("weather api is missing! Check .env file.")
 
 def get_next_workday():
-    next_day = datetime.today() + timedelta(days=1)
-    while next_day.weekday() >= 5:  # If it's Saturday (5) or Sunday (6), keep adding a day
+    pacific = pytz.timezone("America/Los_Angeles")
+    today_local = datetime.now(pacific)  # Get current time in California
+    next_day = today_local + timedelta(days=1)
+
+    while next_day.weekday() >= 5:  # Skip Saturday (5) and Sunday (6)
         next_day += timedelta(days=1)
+
     return next_day
 
 def get_weather(zip_code):
