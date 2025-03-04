@@ -218,11 +218,12 @@ for alert in bart_alerts:
 filtered_trips = find_upcoming_bart_trips(bart_feed)  # Use the updated function
 
 # Display results dynamically based on the current time
-st.subheader("🚆 BART Real-Time Departures from Daly City (Next Hour)")
+st.subheader("🚆 BART Real-Time Departures (Next Hour)")
 
-if filtered_trips:
-    for trip in filtered_trips:
-        st.write(f"Train departing DALY CITY at {trip['departure_time']} for {trip['destination']} STREET OAKLAND")
-else:
-    st.write("No upcoming trains available in the next hour.")
+with st.expander("🔽 Show/Hide Upcoming BART from Daly City Departures"):
+    if filtered_trips:
+        for trip in filtered_trips:
+            st.write(f"Train departing DALY CITY at {trip['departure_time']} for {trip['destination']} STREET OAKLAND")
+    else:
+        st.write("No upcoming trains available in the next hour.")
 
