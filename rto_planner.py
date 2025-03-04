@@ -194,6 +194,7 @@ with col2:
 packing_list = get_packing_recommendations(office_forecast)
 
 st.subheader("🎒 Packing Checklist")
+
 # Initialize session state for selections
 if "selected_items" not in st.session_state:
     st.session_state.selected_items = set()
@@ -208,17 +209,43 @@ def toggle_item(item):
     else:
         st.session_state.selected_items.add(item)
 
-# Display packing list as buttons
+# Custom CSS for button styling
+st.markdown("""
+    <style>
+    .packing-item {
+        display: inline-block;
+        width: 100%;
+        padding: 15px;
+        margin: 5px;
+        text-align: center;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .selected {
+        background-color: green !important;
+        color: white !important;
+    }
+    .unselected {
+        background-color: lightgray !important;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+# Display packing list with clickable divs
 for i, item in enumerate(packing_list):
     col = col1 if i % 2 == 0 else col2
     is_selected = item in st.session_state.selected_items
-    btn_style = "background-color: green; color: white; padding: 10px; border-radius: 8px;" if is_selected else "background-color: lightgray; padding: 10px; border-radius: 8px;"
-
-    if col.button(item, key=item, help="Click to toggle", use_container_width=True):
+    css_class = "selected" if is_selected else "unselected"
+    
+    if col.button(item, key=item, use_container_width=True):
         toggle_item(item)
-
-st.write("### Selected Items:")
-st.write(list(st.session_state.selected_items))
+    
+    # Apply CSS class
+    st.markdown(
+        f'<script>document.getElementById("{item}").className = "{css_class} packing-item";</script>',
+        unsafe_allow_html=True,
+    )
 
 
 # Podcast 
