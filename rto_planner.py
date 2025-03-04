@@ -91,13 +91,6 @@ def format_local_time(timestamp):
     local_time = datetime.fromtimestamp(timestamp, pacific)
     return local_time.strftime('%A, %B %d at %I:%M %p')
 
-def get_motivational_quote():
-    response = requests.get("https://zenquotes.io/api/random")
-    if response.status_code == 200:
-        quote_data = response.json()
-        return f"💡 *{quote_data[0]['q']}* - {quote_data[0]['a']}"
-    return "💡 Stay positive, work hard, and make it happen!"
-
 def get_all_bart_alerts():
     feed = gtfs_realtime_pb2.FeedMessage()
     response = requests.get("https://api.bart.gov/gtfsrt/alerts.aspx")
@@ -151,13 +144,10 @@ def find_upcoming_bart_trips(feed, departure_station, destination_station):
 # Streamlit UI
 st.title("🏢 Ethan's Commute Planner")
 
-st.subheader("🌟 Daily Motivation")
-st.write(get_motivational_quote())
-
 response = requests.get("https://uselessfacts.jsph.pl/random.json?language=en")
 if response.status_code == 200:
     fact = response.json().get("text", "Couldn't fetch a fact!")
-    st.subheader("🤓 Fun Fact of the Day")
+    st.subheader("🌟 Fun Fact")
     st.write(fact)
 
 # Get the next workday
