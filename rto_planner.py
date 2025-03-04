@@ -154,6 +154,12 @@ st.title("🏢 Ethan's Commute Planner")
 st.subheader("🌟 Daily Motivation")
 st.write(get_motivational_quote())
 
+response = requests.get("https://uselessfacts.jsph.pl/random.json?language=en")
+if response.status_code == 200:
+    fact = response.json().get("text", "Couldn't fetch a fact!")
+    st.subheader("🤓 Fun Fact of the Day")
+    st.write(fact)
+
 # Get the next workday
 next_workday = get_next_workday().strftime("%A, %B %d")
 st.subheader(f"🌤 Weather for {next_workday}")
