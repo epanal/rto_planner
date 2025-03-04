@@ -73,7 +73,7 @@ def get_weather(zip_code):
 
 # Packing suggestions based on forecasted weather
 def get_packing_recommendations(weather):
-    items = ["Laptop", "Work Badge", "AirPods", "Webcam", "BART Parking or Amtrak Ticket Paid"]  # Default essentials
+    items = ["Laptop", "Work Badge", "AirPods", "Webcam", "Snacks/Water","BART Parking Ticket", "Amtrak Ticket"]  # Default essentials
 
     if weather:
         if weather["temp"] < 55:
@@ -194,8 +194,32 @@ with col2:
 packing_list = get_packing_recommendations(office_forecast)
 
 st.subheader("🎒 Packing Checklist")
-for item in packing_list:
-    st.checkbox(item, key=item)
+# Create two columns
+col1, col2 = st.columns(2)
+
+# Distribute checkboxes across columns
+for i, item in enumerate(packing_list):
+    if i % 2 == 0:
+        col1.checkbox(item, key=item)
+    else:
+        col2.checkbox(item, key=item)
+
+# Custom CSS to make checkboxes bigger
+st.markdown(
+    """
+    <style>
+    div[data-testid="stCheckbox"] label {
+        font-size: 18px !important;  /* Make label text bigger */
+        padding: 10px 0;  /* Add spacing */
+    }
+    input[type="checkbox"] {
+        width: 25px;
+        height: 25px;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
 # Podcast 
 st.subheader("🎙 Podcasts")
