@@ -211,15 +211,8 @@ st.subheader("🚨 BART Service Alerts")
 
 bart_alerts = get_all_bart_alerts()
 
-# BART alerts expander
-with st.expander("🚨 Show/Hide BART Alerts & Service Advisories"):
-    if bart_alerts:
-        for alert in bart_alerts:
-            st.markdown(f"**🔔 {alert}**")
-            st.markdown("---")  # Separator for readability
-    else:
-        st.write("✅ No active alerts. BART is running smoothly!")
-
+for alert in bart_alerts:
+    st.write(f"⚠️ {alert}")
 
 # Daly City → 12th Street Oakland
 daly_to_oakland_trips = find_upcoming_bart_trips(bart_feed, "DALY", "12TH")
