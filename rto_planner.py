@@ -194,16 +194,73 @@ with col2:
 packing_list = get_packing_recommendations(office_forecast)
 
 st.subheader("🎒 Packing Checklist")
-# Create two columns
-col1, col2 = st.columns(2)
+# Custom CSS for a responsive two-column grid
+st.markdown(
+    """
+    <style>
+        .packing-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .packing-item {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .packing-item:hover {
+            background-color: #d9d9d9;
+        }
+        .checked {
+            background-color: #4CAF50 !important;
+            color: white !important;
+        }
+        @media (max-width: 600px) {
+            .packing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
 
-# Distribute checkboxes across columns
-for i, item in enumerate(packing_list):
-    if i % 2 == 0:
-        col1.checkbox(item, key=item)
-    else:
-        col2.checkbox(item, key=item)
+# Initialize session state for each item
+for item in packing_list:
+    if item not in st.session_state:
+        st.session_state[item] = False
 
+# Display packing list
+packing_html = "<div class='packing-grid'>"
+for item in packing_list:
+    checked_class = "checked" if st.session_state[item] else ""
+    packing_html += f"""
+        <div class="packing-item {checked_class}" onclick="toggleItem('{item}')">
+            {item}
+        </div>
+    """
+packing_html += "</div>"
+
+# Inject JavaScript to handle clicking behavior
+st.markdown(
+    """
+    <script>
+        function toggleItem(item) {
+            let el = document.querySelector(`.packing-item:contains('${item}')`);
+            if (el) {
+                el.classList.toggle("checked");
+                fetch(`/toggle_packing?item=${item}`);
+            }
+        }
+    </script>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(packing_html, unsafe_allow_html=True)
 
 # Podcast 
 st.subheader("🎙 Podcasts")
