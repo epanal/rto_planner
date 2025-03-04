@@ -120,11 +120,11 @@ def get_bart_real_time():
     feed.ParseFromString(response.content)
     return feed
 
-def find_upcoming_bart_trips(feed):
+# Function to find upcoming BART trips from a given departure station
+def find_upcoming_bart_trips(feed, departure_station, destination_station):
     pacific = pytz.timezone("America/Los_Angeles")
     current_time = datetime.now(pacific).timestamp()  # Current time in local timezone
     next_hour = current_time + 3600  # One hour from now
-    destination_station = "12TH"
     
     bart_trips = []
 
@@ -132,10 +132,10 @@ def find_upcoming_bart_trips(feed):
         if entity.trip_update:
             stops = entity.trip_update.stop_time_update
             for stop in stops:
-                if stop.stop_id == "DALY" and stop.HasField("departure"):
+                if stop.stop_id == departure_station and stop.HasField("departure"):
                     departure_time = stop.departure.time
                     if current_time <= departure_time <= next_hour:
-                        # Ensure the train goes to 12th Street Oakland
+                        # Ensure the train goes to the desired destination
                         if any(s.stop_id == destination_station for s in stops):
                             bart_trips.append({
                                 "route": entity.trip_update.trip.route_id,
@@ -214,16 +214,39 @@ bart_alerts = get_all_bart_alerts()
 for alert in bart_alerts:
     st.write(f"⚠️ {alert}")
 
-# Get upcoming BART trips in the next hour
-filtered_trips = find_upcoming_bart_trips(bart_feed)  # Use the updated function
+# Daly City → 12th Street Oakland
+daly_to_oakland_trips = find_upcoming_bart_trips(bart_feed, "DALY", "12TH")
+
+# 12th Street Oakland → San Jose Direction
+oakland_to_sj_trips = find_upcoming_bart_trips(bart_feed, "12TH", "SANJ")
+
+# 12th Street Oakland → Daly City Direction
+oakland_to_daly_trips = find_upcoming_bart_trips(bart_feed, "12TH", "DALY")
 
 # Display results dynamically based on the current time
 st.subheader("🚆 BART Real-Time Departures (Next Hour)")
 
-with st.expander("🔽 Show/Hide Upcoming BART from Daly City Departures"):
-    if filtered_trips:
-        for trip in filtered_trips:
-            st.write(f"Train departing DALY CITY at {trip['departure_time']} for {trip['destination']} STREET OAKLAND")
+# Daly City → 12th Street Oakland
+with st.expander("🔽 Show/Hide Upcoming BART from Daly City to 12th Street Oakland"):
+    if daly_to_oakland_trips:
+        for trip in daly_to_oakland_trips:
+            st.write(f"Train departing DALY CITY at {trip['departure_time']} for 12th STREET OAKLAND")
+    else:
+        st.write("No upcoming trains available in the next hour.")
+
+# 12th Street Oakland → San Jose
+with st.expander("🔽 Show/Hide Upcoming BART from 12th Street Oakland to San Jose Direction"):
+    if oakland_to_sj_trips:
+        for trip in oakland_to_sj_trips:
+            st.write(f"Train departing 12TH STREET OAKLAND at {trip['departure_time']} for SAN JOSE")
+    else:
+        st.write("No upcoming trains available in the next hour.")
+
+# 12th Street Oakland → Daly City
+with st.expander("🔽 Show/Hide Upcoming BART from 12th Street Oakland to Daly City Direction"):
+    if oakland_to_daly_trips:
+        for trip in oakland_to_daly_trips:
+            st.write(f"Train departing 12TH STREET OAKLAND at {trip['departure_time']} for DALY CITY")
     else:
         st.write("No upcoming trains available in the next hour.")
 
