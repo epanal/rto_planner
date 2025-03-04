@@ -204,22 +204,6 @@ for i, item in enumerate(packing_list):
     else:
         col2.checkbox(item, key=item)
 
-# Custom CSS to make checkboxes bigger
-st.markdown(
-    """
-    <style>
-    div[data-testid="stCheckbox"] label {
-        font-size: 18px !important;  /* Make label text bigger */
-        padding: 10px 0;  /* Add spacing */
-    }
-    input[type="checkbox"] {
-        width: 25px;
-        height: 25px;
-    }
-    </style>
-    """,
-    unsafe_allow_html=True
-)
 
 # Podcast 
 st.subheader("🎙 Podcasts")
