@@ -194,15 +194,31 @@ with col2:
 packing_list = get_packing_recommendations(office_forecast)
 
 st.subheader("🎒 Packing Checklist")
+# Initialize session state for selections
+if "selected_items" not in st.session_state:
+    st.session_state.selected_items = set()
+
 # Create two columns
 col1, col2 = st.columns(2)
 
-# Distribute checkboxes across columns
-for i, item in enumerate(packing_list):
-    if i % 2 == 0:
-        col1.checkbox(item, key=item)
+# Function to toggle selection
+def toggle_item(item):
+    if item in st.session_state.selected_items:
+        st.session_state.selected_items.remove(item)
     else:
-        col2.checkbox(item, key=item)
+        st.session_state.selected_items.add(item)
+
+# Display packing list as buttons
+for i, item in enumerate(packing_list):
+    col = col1 if i % 2 == 0 else col2
+    is_selected = item in st.session_state.selected_items
+    btn_style = "background-color: green; color: white; padding: 10px; border-radius: 8px;" if is_selected else "background-color: lightgray; padding: 10px; border-radius: 8px;"
+
+    if col.button(item, key=item, help="Click to toggle", use_container_width=True):
+        toggle_item(item)
+
+st.write("### Selected Items:")
+st.write(list(st.session_state.selected_items))
 
 
 # Podcast 
