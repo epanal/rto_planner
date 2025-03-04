@@ -149,7 +149,7 @@ def find_upcoming_bart_trips(feed, departure_station, destination_station):
     return bart_trips
 
 # Streamlit UI
-st.title("🏢 Ethan's Commute App")
+st.title("🏢 Ethan's Commute Planner")
 
 st.subheader("🌟 Daily Motivation")
 st.write(get_motivational_quote())
