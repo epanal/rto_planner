@@ -218,7 +218,7 @@ for alert in bart_alerts:
 daly_to_oakland_trips = find_upcoming_bart_trips(bart_feed, "DALY", "12TH")
 
 # 12th Street Oakland → San Jose Direction
-oakland_to_sj_trips = find_upcoming_bart_trips(bart_feed, "12TH", "SANJ")
+oakland_to_sj_trips = find_upcoming_bart_trips(bart_feed, "12TH", "MLPT")
 
 # 12th Street Oakland → Daly City Direction
 oakland_to_daly_trips = find_upcoming_bart_trips(bart_feed, "12TH", "DALY")
@@ -235,10 +235,10 @@ with st.expander("🔽 Show/Hide Upcoming BART from Daly City to 12th Street Oak
         st.write("No upcoming trains available in the next hour.")
 
 # 12th Street Oakland → San Jose
-with st.expander("🔽 Show/Hide Upcoming BART from 12th Street Oakland to San Jose Direction"):
+with st.expander("🔽 Show/Hide Upcoming BART from 12th Street Oakland to Milpitas Direction"):
     if oakland_to_sj_trips:
         for trip in oakland_to_sj_trips:
-            st.write(f"Train departing 12TH STREET OAKLAND at {trip['departure_time']} for SAN JOSE")
+            st.write(f"Train departing 12TH STREET OAKLAND at {trip['departure_time']} for Milpitas")
     else:
         st.write("No upcoming trains available in the next hour.")
 
